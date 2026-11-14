@@ -1,0 +1,25 @@
+{
+  "name": "campus-pilot-ai",
+  "version": "1.0.0",
+  "description": "CampusPilot AI - Autonomous Agentic College Student Support & Operations Platform",
+  "main": "run.py",
+  "type": "module",
+  "scripts": {
+    "start": "node backend/server.js",
+    "server": "node backend/server.js",
+    "server:py": "python run.py",
+    "db:migrate": "node supabase/apply-migrations.js",
+    "db:seed": "python -m backend.seed_data",
+    "test:workflows": "python test_workflows.py",
+    "frontend:dev": "cd frontend && npm run dev",
+    "frontend:build": "cd frontend && npm run build"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.1",
+    "cors": "^2.8.6",
+    "dotenv": "^16.4.7",
+    "express": "^5.3.0",
+    "pg": "^8.13.3",
+    "sqlite3": "^6.0.1"
+  }
+}
