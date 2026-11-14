@@ -10,7 +10,18 @@ import {
   TicketStatusType
 } from './types';
 
-const API_BASE = '/api';
+const rawEnvUrl = (((import.meta as any).env?.VITE_API_URL as string) || '').trim().replace(/\/+$/, '');
+// Strip trailing /api if user accidentally provided it in Vercel environment variables
+const cleanBaseUrl = rawEnvUrl.replace(/\/+api\/?$/, '');
+const API_BASE = cleanBaseUrl ? `${cleanBaseUrl}/api` : '/api';
+
+function buildUrl(endpoint: string): URL {
+  const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  if (cleanBaseUrl) {
+    return new URL(`${cleanBaseUrl}/api${normalizedEndpoint}`);
+  }
+  return new URL(`${window.location.origin}/api${normalizedEndpoint}`);
+}
 
 export async function fetchSystemStatus(): Promise<SystemStatus> {
   const res = await fetch(`${API_BASE}/system-status`);
@@ -73,7 +84,7 @@ export async function fetchTickets(params?: {
   priority?: PriorityType;
   search?: string;
 }): Promise<Ticket[]> {
-  const url = new URL(`${window.location.origin}${API_BASE}/tickets`);
+  const url = buildUrl('/tickets');
   if (params?.student_id) url.searchParams.append('student_id', params.student_id);
   if (params?.category && params.category !== 'all') url.searchParams.append('category', params.category);
   if (params?.status && params.status !== 'all') url.searchParams.append('status', params.status);
@@ -131,7 +142,7 @@ export async function addStaffNote(
 }
 
 export async function fetchNotifications(studentId?: string): Promise<NotificationItem[]> {
-  const url = new URL(`${window.location.origin}${API_BASE}/notifications`);
+  const url = buildUrl('/notifications');
   if (studentId) url.searchParams.append('student_id', studentId);
   const res = await fetch(url.toString());
   if (!res.ok) throw new Error('Failed to fetch notifications');
